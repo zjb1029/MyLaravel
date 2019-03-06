@@ -12,12 +12,19 @@ use Faker\Generator as Faker;
 | model instances for testing / seeding your application's database.
 |
 */
-
+/**
+ *  传入一个用户模型类，闭包函数中填充用户类的关联数组并返回
+ */
 $factory->define(App\Models\User::class, function (Faker $faker) {
+    $date_time = $faker->date . ' ' . $faker->time;
+    static $password;
     return [
         'name' => $faker->name,
-        'email' => $faker->unique()->safeEmail,
-        'password' => '$2y$10$TKh8H1.PfQx37YgCzwiKb.KjNyWgaHb9cbcoQgdIVFlYg7B77UdFm', // secret
+        'email' => $faker->safeEmail,
+        'is_admin' => 0,
+        'password' => $password ?: $password = bcrypt('secret'),
         'remember_token' => str_random(10),
+        'created_at' => $date_time,
+        'updated_at' => $date_time,
     ];
 });

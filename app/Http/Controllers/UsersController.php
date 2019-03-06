@@ -10,16 +10,26 @@ class UsersController extends Controller
 {
     public function __construct()
     {
+
+        /*
+         * []中的方法只允许auth(已登录)访问
+         *
+         */
         $this->middleware('auth',[
-            'except'=>['show','create','store']
+            'except'=>['show','create','store','index']
         ]);
+
+        /*
+         * []中的方法只允许guest(游客未登录)访问
+         */
         $this->middleware('guest',[
             'only'=>['create']
         ]);
     }
 
     public function index(){
-        return view('users.index');
+        $users = User::paginate(10);
+        return view('users.index',compact('users'));
     }
 
     public function create(){
@@ -75,5 +85,12 @@ class UsersController extends Controller
 
     public function show(User $user){
         return view('users.show', compact('user'));
+    }
+
+    public function destroy(User $user){
+        $this->authorize('destroy', $user);
+        $user->delete();
+        session()->flash("success","成功删除用户".$user->name);
+        return back();
     }
 }
