@@ -70,4 +70,62 @@ class User extends Authenticatable
     public function statuses(){
         return $this->hasMany(Status::class);
     }
+
+    /**
+     * 关注
+     * @param $user_ids
+     */
+    public function follow($user_ids)
+    {
+        if (!is_array($user_ids)) {
+            $user_ids = compact('user_ids');
+        }
+        $this->followings()->sync($user_ids, false);
+    }
+
+    /**
+     * 取消关注
+     * @param $user_ids
+     */
+    public function unfollow($user_ids)
+    {
+        if (!is_array($user_ids)) {
+            $user_ids = compact('user_ids');
+        }
+        $this->followings()->detach($user_ids);
+    }
+
+    /**
+     * 是否关注
+     * @param $user_id
+     * @return mixed
+     */
+    public function isFollowing($user_id)
+    {
+        return $this->followings->contains($user_id);
+    }
+
+    /**
+     * 定义与User的多对多关系
+     * 关联表:followers
+     * 主键：user_id
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function followers()
+    {
+        return $this->belongsToMany(User::Class, 'followers', 'user_id', 'follower_id');
+    }
+
+    /**
+     * 定义与User的多对多关系
+     * 关联表：followers
+     * 主键：follower_id
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function followings()
+    {
+        return $this->belongsToMany(User::Class, 'followers', 'follower_id', 'user_id');
+    }
+
+
 }
