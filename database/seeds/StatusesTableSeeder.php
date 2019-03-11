@@ -1,0 +1,24 @@
+<?php
+
+use Illuminate\Database\Seeder;
+use App\Models\Status;
+class StatusesTableSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function run()
+    {
+        $user_ids = [];
+        for($n=1;$n<51;$n++){
+            $user_ids[] = $n;
+        }
+        $faker = app(Faker\Generator::class);
+        $statuses = factory(Status::class)->times(100)->make()->each(function ($status) use ($faker, $user_ids) {
+            $status->user_id = $faker->randomElement($user_ids);
+        });
+        Status::insert($statuses->toArray());
+    }
+}

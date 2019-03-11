@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Notifications\RestPassword;
+use App\Models\Status;
 class User extends Authenticatable
 {
     use Notifiable;
@@ -51,6 +52,22 @@ class User extends Authenticatable
 
     public function sendPasswordResetNotification($token)
     {
+        $this->notify(new ResetPassword($token));
     }
 
+
+    /**
+     * 获取微博数据，根据created_at倒叙
+     */
+    public function feed(){
+        return $this->statuses()->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * 定义与status的一对多关系
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function statuses(){
+        return $this->hasMany(Status::class);
+    }
 }
